@@ -183,6 +183,8 @@ class MainWindow(QMainWindow):
         if ":
             self.info_widget.set_")
         else:
-            self.info_widget.set_modo("SIMULACIÃ“N")
+            self.info_widget.set_modo("SIMULACIÓN")
+
+
 
 
