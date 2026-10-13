@@ -9,6 +9,7 @@ import os
 
 from core import PostEngine, Post, Estado
 from ui.dashboard import DashboardWidget
+from ui.info import InfoWidget
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -78,14 +79,8 @@ class MainWindow(QMainWindow):
         right_frame = QFrame()
         right_frame.setObjectName("right_frame")
         right_layout = QVBoxLayout(right_frame)
-        info_header = QLabel("INFORMACIÓN")
-        info_header.setFont(QFont("Consolas", 12, QFont.Bold))
-        info_header.setAlignment(Qt.AlignCenter)
-        self.info_label = QLabel("Modo: SIMULACIÓN")
-        self.info_label.setFont(QFont("Consolas", 9))
-        self.info_label.setWordWrap(True)
-        right_layout.addWidget(info_header)
-        right_layout.addWidget(self.info_label)
+        self.info_widget = InfoWidget()
+        right_layout.addWidget(self.info_widget)
         right_layout.addStretch()
         splitter.addWidget(right_frame)
         splitter.setSizes([280, 640, 280])
@@ -102,10 +97,14 @@ class MainWindow(QMainWindow):
         self.combo_precaucion.addItem("Sin precaución", None)
         for c in self.engine.componentes:
             self.combo_precaucion.addItem(f"Precaución: {c.nombre}", c.id)
+        self.combo_modo = QComboBox()
+        self.combo_modo.addItem("Modo SIMULACIÓN", "SIMULACION")
+        self.combo_modo.addItem("Modo HARDWARE REAL", "REAL")
         controls_layout.addWidget(self.btn_iniciar)
         controls_layout.addWidget(self.btn_reset)
         controls_layout.addWidget(self.combo_falla)
         controls_layout.addWidget(self.combo_precaucion)
+        controls_layout.addWidget(self.combo_modo)
         controls_layout.addStretch()
         main_layout.addWidget(controls_frame)
 
@@ -113,6 +112,7 @@ class MainWindow(QMainWindow):
         self.btn_reset.clicked.connect(self.reset_ui)
         self.combo_falla.currentIndexChanged.connect(self._aplicar_falla_combo)
         self.combo_precaucion.currentIndexChanged.connect(self._aplicar_precaucion_combo)
+        self.combo_modo.currentIndexChanged.connect(self._cambiar_modo)
 
     def apply_styles(self):
         style_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "styles", "bios.qss")
@@ -177,3 +177,10 @@ class MainWindow(QMainWindow):
             self.post.simular_precaucion(cid)
             self.combo_falla.setCurrentIndex(0)
         self.dashboard.refresh()
+
+    def _cambiar_modo(self):
+        modo = self.combo_modo.currentData()
+        if modo == "REAL":
+            self.info_widget.set_modo("HARDWARE REAL")
+        else:
+            self.info_widget.set_modo("SIMULACIÓN")
