@@ -1,0 +1,7 @@
+PySide6
+psutil
+pyinstaller
+pytest
+pytest-qt
+ruff
+mypy

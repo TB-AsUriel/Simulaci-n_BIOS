@@ -1,0 +1,44 @@
+# BIOS_Simulator
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual env
+.venv/
+venv/
+ENV/
+
+# VS Code
+.vscode/
+
+# PySide/Qt
+*.ui
+*.qrc
+*.pyproject.user
+*.pro.user
+*.db
+*.autosave
+
+# Builds
+build/
+dist/
+*.spec
+*.exe
+*.zip
+
+# Tests
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Recursos temporales
+temp/
+tmp/
