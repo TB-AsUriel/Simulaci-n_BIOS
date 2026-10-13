@@ -1,14 +1,11 @@
-# -*- coding: utf-8 -*-
 
-from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, 
-                             QLabel, QPushButton, QFrame, QStackedWidget, QListWidget, 
-                             QListWidgetItem, QSplitter, QProgressBar, QTextEdit)
-from PySide6.QtCore import Qt, QTimer, QSize
-from PySide6.QtGui import QIcon, QFont, QPixmap
-import sys
 import os
 
-from core import Estado, PostEngine, Post
+from core import Estado, PostEngine
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QFont, QIcon
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
+
 
 class ComponentItem(QFrame):
     def __init__(self, componente):

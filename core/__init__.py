@@ -1,5 +1,5 @@
-from .componentes import Estado, Componente, PostEngine
+from .componentes import Componente, Estado, PostEngine
 from .diagnostico import Diagnostico
 from .post import Post
 
-__all__ = ["Estado", "Componente", "PostEngine", "Diagnostico", "Post"]
+__all__ = ["Componente", "Diagnostico", "Estado", "Post", "PostEngine"]

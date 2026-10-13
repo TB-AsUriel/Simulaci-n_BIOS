@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional
+
 
 class Estado(Enum):
     FUNCIONAL = "FUNCIONAL"
@@ -14,7 +13,7 @@ class Componente:
     nombre: str  # Nombre en español para UI
     estado: Estado = Estado.FUNCIONAL
     descripcion: str = ""
-    temperatura: Optional[float] = None
+    temperatura: float | None = None
     mensaje: str = ""
     prioridad: str = "NORMAL"  # CRITICO | IMPORTANTE | NORMAL
 
@@ -24,9 +23,9 @@ class Componente:
 
 class PostEngine:
     def __init__(self):
-        self.componentes: List[Componente] = self._crear_componentes()
+        self.componentes: list[Componente] = self._crear_componentes()
 
-    def _crear_componentes(self) -> List[Componente]:
+    def _crear_componentes(self) -> list[Componente]:
         return [
             Componente(id="cpu", nombre="Procesador", descripcion="Unidad central de procesamiento", prioridad="CRITICO"),
             Componente(id="ram", nombre="Memoria RAM", descripcion="Memoria de acceso aleatorio", prioridad="CRITICO"),
@@ -38,7 +37,7 @@ class PostEngine:
             Componente(id="red", nombre="Red", descripcion="Conectividad de red", prioridad="NORMAL"),
         ]
 
-    def get_componente(self, comp_id: str) -> Optional[Componente]:
+    def get_componente(self, comp_id: str) -> Componente | None:
         for c in self.componentes:
             if c.id == comp_id:
                 return c

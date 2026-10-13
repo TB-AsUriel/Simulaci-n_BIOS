@@ -1,4 +1,5 @@
-from .componentes import Estado, Componente
+from .componentes import Componente, Estado
+
 
 class Diagnostico:
     def evaluar(self, componente: Componente) -> Estado:

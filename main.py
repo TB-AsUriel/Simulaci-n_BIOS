@@ -1,10 +1,11 @@
-# -*- coding: utf-8 -*-
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget
+import os
+import sys
+
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
-import sys
-import os
+from PySide6.QtWidgets import QApplication, QLabel, QMainWindow, QVBoxLayout, QWidget
+
 
 class MainWindow(QMainWindow):
     def __init__(self):

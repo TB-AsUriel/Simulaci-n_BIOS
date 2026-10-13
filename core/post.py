@@ -1,10 +1,11 @@
-from .componentes import Estado, Componente, PostEngine
-from typing import List, Tuple
+
+from .componentes import Estado, PostEngine
+
 
 class Post:
     def __init__(self, engine: PostEngine = None):
         self.engine = engine or PostEngine()
-        self.pasos: List[Tuple[str, str]] = [
+        self.pasos: list[tuple[str, str]] = [
             ("BIOS/UEFI", "Inicializando firmware"),
             ("CPU", "Comprobando procesador"),
             ("RAM", "Comprobando memoria RAM"),
