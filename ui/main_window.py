@@ -1,7 +1,6 @@
 
 import os
 
-from core import Estado, Post, PostEngine
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (
@@ -16,6 +15,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from core import Estado, Post, PostEngine
 from ui.dashboard import DashboardWidget
 
 
@@ -144,7 +144,7 @@ class MainWindow(QMainWindow):
 
     def _avanzar_post(self):
         if self._post_paso < len(self._post_eventos):
-            nombre, msg, estado = self._post_eventos[self._post_paso]
+            nombre, msg, _estado = self._post_eventos[self._post_paso]
             self.log_label.setText(f"{nombre}: {msg}")
             pct = int((self._post_paso + 1) * 100 / len(self._post_eventos))
             self.progress_bar.setValue(pct)
