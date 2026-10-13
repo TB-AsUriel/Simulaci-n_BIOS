@@ -1,4 +1,4 @@
-from .componentes import Estado, Componente, PostEngine
+﻿from .componentes import Estado, Componente, PostEngine
 from typing import List, Tuple
 import random
 
@@ -9,11 +9,11 @@ class Post:
             ("BIOS/UEFI", "Inicializando firmware"),
             ("CPU", "Comprobando procesador"),
             ("RAM", "Comprobando memoria RAM"),
-            ("GPU", "Comprobando tarjeta gráfica"),
+            ("GPU", "Comprobando tarjeta grÃ¡fica"),
             ("Placa base", "Comprobando placa base"),
             ("Almacenamiento", "Comprobando almacenamiento"),
             ("Ventiladores", "Comprobando ventiladores"),
-            ("Periféricos", "Comprobando periféricos"),
+            ("PerifÃ©ricos", "Comprobando perifÃ©ricos"),
             ("Resultado", "Evaluando resultados"),
         ]
         self.fallas_simuladas: set = set()
@@ -33,9 +33,9 @@ class Post:
         self.fallas_simuladas.clear()
         self.precauciones_simuladas.clear()
 
+        return eventos
     def ejecutar(self):
         eventos = []
-        # Aplicar estados simulados
         for cid in self.fallas_simuladas:
             c = self.engine.get_componente(cid)
             if c:
@@ -44,4 +44,6 @@ class Post:
             c = self.engine.get_componente(cid)
             if c:
                 c.set_estado(Estado.PRECAUCION, f"{c.nombre} requiere atención")
+        for nombre, msg in self.pasos:
+            eventos.append((nombre, msg, Estado.FUNCIONAL))
         return eventos
