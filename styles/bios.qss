@@ -1,0 +1,13 @@
+/* BIOS Simulator - Tema oscuro tipo UEFI */
+QMainWindow {
+    background-color: #050816;
+    color: #e5e7eb;
+}
+
+#status_label {
+    padding: 12px 24px;
+    border: 2px solid #3b82f6;
+    border-radius: 4px;
+    background-color: #0f172a;
+    color: #60a5fa;
+}
