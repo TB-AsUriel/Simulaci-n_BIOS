@@ -4,7 +4,7 @@ from enum import Enum
 
 class Estado(Enum):
     FUNCIONAL = "FUNCIONAL"
-    PRECAUCION = "PRECAUCIÓN"
+    PRECAUCIÓN = "PRECAUCIÓN"
     FALLA = "FALLA"
 
 @dataclass
