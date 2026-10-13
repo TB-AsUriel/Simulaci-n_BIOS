@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, 
                              QLabel, QPushButton, QFrame, QSplitter, QProgressBar, QComboBox)
@@ -14,7 +14,7 @@ from ui.info import InfoWidget
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("BIOS Simulator - POWER ON SELF TEST")
+        self.setWindowTitle("Simulador de BIOS - POWER ON SELF TEST")
         self.setMinimumSize(1200, 800)
         self.engine = PostEngine()
         self.post = Post(self.engine)
@@ -87,24 +87,24 @@ class MainWindow(QMainWindow):
 
         controls_frame = QFrame()
         controls_layout = QHBoxLayout(controls_frame)
-        self.btn_iniciar = QPushButton("▶ INICIAR POST")
+        self.btn_iniciar = QPushButton("â–¶ INICIAR POST")
         self.btn_reset = QPushButton("RESET")
         self.combo_falla = QComboBox()
         self.combo_falla.addItem("Sin falla", None)
         for c in self.engine.componentes:
             self.combo_falla.addItem(f"Falla: {c.nombre}", c.id)
         self.combo_precaucion = QComboBox()
-        self.combo_precaucion.addItem("Sin precaución", None)
+        self.combo_precaucion.addItem("Sin precauciÃ³n", None)
         for c in self.engine.componentes:
-            self.combo_precaucion.addItem(f"Precaución: {c.nombre}", c.id)
-        self.combo_modo = QComboBox()
-        self.combo_modo.addItem("Modo SIMULACIÓN", "SIMULACION")
-        self.combo_modo.addItem("Modo HARDWARE REAL", "REAL")
+            self.combo_precaucion.addItem(f"PrecauciÃ³n: {c.nombre}", c.id)
+        self. = QComboBox()
+        self..addItem("Modo SIMULACIÃ“N", "SIMULACION")
+        self.combo_")
         controls_layout.addWidget(self.btn_iniciar)
         controls_layout.addWidget(self.btn_reset)
         controls_layout.addWidget(self.combo_falla)
         controls_layout.addWidget(self.combo_precaucion)
-        controls_layout.addWidget(self.combo_modo)
+        controls_layout.addWidget(self.)
         controls_layout.addStretch()
         main_layout.addWidget(controls_frame)
 
@@ -112,7 +112,7 @@ class MainWindow(QMainWindow):
         self.btn_reset.clicked.connect(self.reset_ui)
         self.combo_falla.currentIndexChanged.connect(self._aplicar_falla_combo)
         self.combo_precaucion.currentIndexChanged.connect(self._aplicar_precaucion_combo)
-        self.combo_modo.currentIndexChanged.connect(self._cambiar_modo)
+        self..currentIndexChanged.connect(self.)
 
     def apply_styles(self):
         style_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "styles", "bios.qss")
@@ -158,11 +158,11 @@ class MainWindow(QMainWindow):
         hay_falla = any(c.estado == Estado.FALLA for c in self.engine.componentes)
         hay_precaucion = any(c.estado == Estado.PRECAUCION for c in self.engine.componentes)
         if hay_falla:
-            self.log_label.setText("🔴 SISTEMA NO PUEDE ARRANCAR\nSe detectaron fallas críticas.")
+            self.log_label.setText("ðŸ”´ SISTEMA NO PUEDE ARRANCAR\nSe detectaron fallas crÃ­ticas.")
         elif hay_precaucion:
-            self.log_label.setText("🟡 SISTEMA CON PRECAUCIÓN\nSe detectaron advertencias.")
+            self.log_label.setText("ðŸŸ¡ SISTEMA CON PRECAUCIÃ“N\nSe detectaron advertencias.")
         else:
-            self.log_label.setText("🟢 SISTEMA OK\nPOST completado correctamente. Sistema listo para iniciar.")
+            self.log_label.setText("ðŸŸ¢ SISTEMA OK\nPOST completado correctamente. Sistema listo para iniciar.")
 
     def _aplicar_falla_combo(self):
         cid = self.combo_falla.currentData()
@@ -178,9 +178,11 @@ class MainWindow(QMainWindow):
             self.combo_falla.setCurrentIndex(0)
         self.dashboard.refresh()
 
-    def _cambiar_modo(self):
-        modo = self.combo_modo.currentData()
-        if modo == "REAL":
-            self.info_widget.set_modo("HARDWARE REAL")
+    def (self):
+        modo = self..currentData()
+        if ":
+            self.info_widget.set_")
         else:
-            self.info_widget.set_modo("SIMULACIÓN")
+            self.info_widget.set_modo("SIMULACIÃ“N")
+
+
