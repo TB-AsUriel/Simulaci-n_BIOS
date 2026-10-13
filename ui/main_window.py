@@ -1,23 +1,14 @@
+# -*- coding: utf-8 -*-
 
-import os
-
+from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, 
+                             QLabel, QPushButton, QFrame, QSplitter, QProgressBar, QComboBox)
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QFont
-from PySide6.QtWidgets import (
-    QFrame,
-    QHBoxLayout,
-    QLabel,
-    QMainWindow,
-    QProgressBar,
-    QPushButton,
-    QSplitter,
-    QVBoxLayout,
-    QWidget,
-)
+import sys
+import os
 
-from core import Estado, Post, PostEngine
+from core import PostEngine, Post, Estado
 from ui.dashboard import DashboardWidget
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -90,7 +81,7 @@ class MainWindow(QMainWindow):
         info_header = QLabel("INFORMACIÓN")
         info_header.setFont(QFont("Consolas", 12, QFont.Bold))
         info_header.setAlignment(Qt.AlignCenter)
-        self.info_label = QLabel("Sistema en modo simulación")
+        self.info_label = QLabel("Modo: SIMULACIÓN")
         self.info_label.setFont(QFont("Consolas", 9))
         self.info_label.setWordWrap(True)
         right_layout.addWidget(info_header)
@@ -99,23 +90,29 @@ class MainWindow(QMainWindow):
         splitter.addWidget(right_frame)
         splitter.setSizes([280, 640, 280])
 
-        buttons_frame = QFrame()
-        buttons_layout = QHBoxLayout(buttons_frame)
+        controls_frame = QFrame()
+        controls_layout = QHBoxLayout(controls_frame)
         self.btn_iniciar = QPushButton("▶ INICIAR POST")
         self.btn_reset = QPushButton("RESET")
-        self.btn_falla_cpu = QPushButton("SIMULAR FALLA CPU")
-        self.btn_falla_ram = QPushButton("SIMULAR FALLA RAM")
-        buttons_layout.addWidget(self.btn_iniciar)
-        buttons_layout.addWidget(self.btn_reset)
-        buttons_layout.addWidget(self.btn_falla_cpu)
-        buttons_layout.addWidget(self.btn_falla_ram)
-        buttons_layout.addStretch()
-        main_layout.addWidget(buttons_frame)
+        self.combo_falla = QComboBox()
+        self.combo_falla.addItem("Sin falla", None)
+        for c in self.engine.componentes:
+            self.combo_falla.addItem(f"Falla: {c.nombre}", c.id)
+        self.combo_precaucion = QComboBox()
+        self.combo_precaucion.addItem("Sin precaución", None)
+        for c in self.engine.componentes:
+            self.combo_precaucion.addItem(f"Precaución: {c.nombre}", c.id)
+        controls_layout.addWidget(self.btn_iniciar)
+        controls_layout.addWidget(self.btn_reset)
+        controls_layout.addWidget(self.combo_falla)
+        controls_layout.addWidget(self.combo_precaucion)
+        controls_layout.addStretch()
+        main_layout.addWidget(controls_frame)
 
         self.btn_iniciar.clicked.connect(self.iniciar_post)
         self.btn_reset.clicked.connect(self.reset_ui)
-        self.btn_falla_cpu.clicked.connect(lambda: self.simular_falla("cpu"))
-        self.btn_falla_ram.clicked.connect(lambda: self.simular_falla("ram"))
+        self.combo_falla.currentIndexChanged.connect(self._aplicar_falla_combo)
+        self.combo_precaucion.currentIndexChanged.connect(self._aplicar_precaucion_combo)
 
     def apply_styles(self):
         style_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "styles", "bios.qss")
@@ -133,6 +130,8 @@ class MainWindow(QMainWindow):
         self._post_eventos = []
         self.btn_iniciar.setEnabled(True)
         self.post_timer.stop()
+        self.combo_falla.setCurrentIndex(0)
+        self.combo_precaucion.setCurrentIndex(0)
 
     def iniciar_post(self):
         self.reset_ui()
@@ -159,18 +158,22 @@ class MainWindow(QMainWindow):
         hay_falla = any(c.estado == Estado.FALLA for c in self.engine.componentes)
         hay_precaucion = any(c.estado == Estado.PRECAUCION for c in self.engine.componentes)
         if hay_falla:
-            criticos = [c.nombre for c in self.engine.componentes if c.estado == Estado.FALLA and c.prioridad == "CRITICO"]
-            if criticos:
-                self.log_label.setText("🔴 SISTEMA NO PUEDE ARRANCAR\nFallas críticas detectadas.")
-            else:
-                self.log_label.setText("🔴 SISTEMA NO PUEDE ARRANCAR\nSe detectaron fallas.")
+            self.log_label.setText("🔴 SISTEMA NO PUEDE ARRANCAR\nSe detectaron fallas críticas.")
         elif hay_precaucion:
             self.log_label.setText("🟡 SISTEMA CON PRECAUCIÓN\nSe detectaron advertencias.")
         else:
             self.log_label.setText("🟢 SISTEMA OK\nPOST completado correctamente. Sistema listo para iniciar.")
 
-    def simular_falla(self, comp_id: str):
-        c = self.engine.get_componente(comp_id)
-        if c:
-            c.set_estado(Estado.FALLA, f"{c.nombre} no responde")
+    def _aplicar_falla_combo(self):
+        cid = self.combo_falla.currentData()
+        if cid:
+            self.post.simular_falla(cid)
+            self.combo_precaucion.setCurrentIndex(0)
+        self.dashboard.refresh()
+
+    def _aplicar_precaucion_combo(self):
+        cid = self.combo_precaucion.currentData()
+        if cid:
+            self.post.simular_precaucion(cid)
+            self.combo_falla.setCurrentIndex(0)
         self.dashboard.refresh()
