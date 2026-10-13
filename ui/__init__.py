@@ -1,5 +1,4 @@
-from PySide6.QtWidgets import QWidget
-
 from .dashboard import DashboardWidget
+from .info import InfoWidget
 
-__all__ = ["DashboardWidget"]
+__all__ = ["DashboardWidget", "InfoWidget"]
