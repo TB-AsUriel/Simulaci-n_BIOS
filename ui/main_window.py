@@ -1,17 +1,19 @@
 ﻿# -*- coding: utf-8 -*-
-from PySide6.QtWidgets import (QMainWindow,QWidget,QVBoxLayout,QHBoxLayout,QLabel,QPushButton,QFrame,QSplitter,QProgressBar,QComboBox,QTextEdit)
+from PySide6.QtWidgets import (QMainWindow,QWidget,QVBoxLayout,QHBoxLayout,QLabel,QPushButton,QFrame,QSplitter,QProgressBar,QButtonGroup,QTextEdit)
 from PySide6.QtCore import Qt,QTimer
 from PySide6.QtGui import QFont
 import os
-from core import PostEngine,Post,Estado
+import random
+from core import PostEngine,Post,Resultado
 from ui.dashboard import DashboardWidget
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("BIOS Simulator - POWER ON SELF TEST")
+        self.setWindowTitle("Simulador BIOS - POWER ON SELF TEST")
         self.setMinimumSize(1100,760)
         self.engine=PostEngine(); self.post=Post(self.engine)
+        self.escenario="TODO_OK"
         self.post_timer=QTimer(self); self.post_timer.timeout.connect(self._avanzar_post)
         self._post_paso=0; self._post_eventos=[]
         self.setup_ui(); self.apply_styles(); self.reset_ui()
@@ -25,25 +27,33 @@ class MainWindow(QMainWindow):
         s=QLabel("POST - Power On Self Test"); s.setAlignment(Qt.AlignCenter); s.setFont(QFont("Consolas",12))
         hl.addWidget(t); hl.addWidget(s); ml.addWidget(header)
         sp=QSplitter(Qt.Horizontal); ml.addWidget(sp)
-        self.dashboard=DashboardWidget(self.engine)
-        df=QFrame(); dl=QVBoxLayout(df); dl.addWidget(self.dashboard); sp.addWidget(df)
         center=QFrame(); center.setObjectName("center_frame")
         cl=QVBoxLayout(center)
         self.progress=QProgressBar(); self.progress.setMinimum(0); self.progress.setMaximum(100); self.progress.setFormat("POST %p%")
         cl.addWidget(self.progress)
         self.log=QTextEdit(); self.log.setReadOnly(True); self.log.setFont(QFont("Consolas",9)); self.log.setMinimumHeight(420)
         cl.addWidget(self.log)
-        sp.addWidget(center); sp.setSizes([320,760])
-        bar=QFrame(); bl=QHBoxLayout(bar)
+        sp.addWidget(center)
+        self.dashboard=DashboardWidget(self.engine)
+        df=QFrame(); dl=QVBoxLayout(df); dl.addWidget(self.dashboard); sp.addWidget(df)
+        sp.setSizes([360,760])
+        bar=QFrame(); bl=QVBoxLayout(bar)
+        sel=QHBoxLayout(); sel.addWidget(QLabel("Escenario:"))
+        claves=["TODO_OK","ADVERTENCIAS","FALLA_CRITICA","ALEATORIO"]
+        textos=["Caso 1: Todo OK","Caso 2: Advertencias","Caso 3: Falla crítica","Caso 4: Aleatorio"]
+        self.btn_caso=[]
+        self.grupo_escenario=QButtonGroup(self); self.grupo_escenario.setExclusive(True)
+        for i,texto in enumerate(textos):
+            b=QPushButton(texto); b.setCheckable(True); self.grupo_escenario.addButton(b,i); sel.addWidget(b)
+            b.clicked.connect(lambda _=False,k=claves[i]: self.seleccionar_escenario(k))
+            self.btn_caso.append(b)
+        self.btn_caso[0].setChecked(True); sel.addStretch()
+        acc=QHBoxLayout()
         self.btn_iniciar=QPushButton("▶ INICIAR POST"); self.btn_reset=QPushButton("RESET")
-        self.combo_falla=QComboBox(); self.combo_falla.addItem("Sin falla",None)
-        for c in self.engine.componentes: self.combo_falla.addItem(f"Falla: {c.nombre}",c.id)
-        self.combo_prec=QComboBox(); self.combo_prec.addItem("Sin precaución",None)
-        for c in self.engine.componentes: self.combo_prec.addItem(f"Precaución: {c.nombre}",c.id)
-        bl.addWidget(self.btn_iniciar); bl.addWidget(self.btn_reset); bl.addWidget(self.combo_falla); bl.addWidget(self.combo_prec); bl.addStretch()
+        acc.addWidget(self.btn_iniciar); acc.addWidget(self.btn_reset); acc.addStretch()
+        bl.addLayout(sel); bl.addLayout(acc)
         ml.addWidget(bar)
         self.btn_iniciar.clicked.connect(self.iniciar); self.btn_reset.clicked.connect(self.reset_ui)
-        self.combo_falla.currentIndexChanged.connect(self.aplicar_falla); self.combo_prec.currentIndexChanged.connect(self.aplicar_prec)
 
     def apply_styles(self):
         p=os.path.join(os.path.dirname(os.path.dirname(__file__)),"styles","bios.qss")
@@ -54,29 +64,45 @@ class MainWindow(QMainWindow):
         self.post.limpiar_fallas(); self.engine.reset(); self.dashboard.refresh()
         self.progress.setValue(0); self.log.clear(); self.log.append("Listo para iniciar POST.")
         self._post_paso=0; self._post_eventos=[]; self.btn_iniciar.setEnabled(True); self.post_timer.stop()
-        self.combo_falla.setCurrentIndex(0); self.combo_prec.setCurrentIndex(0)
+
+    def seleccionar_escenario(self, clave):
+        self.escenario=clave
+        self.reset_ui(); self._aplicar_escenario(); self.dashboard.refresh()
+
+    def _aplicar_escenario(self):
+        self.post.limpiar_fallas()
+        esc=self.escenario
+        if esc=="ALEATORIO":
+            esc=random.choice(["TODO_OK","ADVERTENCIAS","FALLA_CRITICA"])
+            self.log.append(f"Escenario aleatorio seleccionado: {esc}")
+        if esc=="ADVERTENCIAS":
+            self.post.simular_precaucion("gpu"); self.post.simular_falla("ventiladores")
+            self.log.append("Escenario: advertencias en componentes no críticos (GPU / ventiladores).")
+        elif esc=="FALLA_CRITICA":
+            critico=random.choice(["cpu","ram","placa_base"])
+            self.post.simular_falla(critico)
+            self.log.append(f"Escenario: falla crítica en componente esencial ({critico}).")
+        else:
+            self.log.append("Escenario: todos los componentes funcionan correctamente.")
 
     def iniciar(self):
-        self.reset_ui(); self._post_eventos=self.post.ejecutar(); self._post_paso=0; self.btn_iniciar.setEnabled(False); self.progress.setValue(0); self.post_timer.start(550)
+        self.reset_ui(); self._aplicar_escenario(); self._post_eventos=self.post.ejecutar()
+        self._post_paso=0; self.btn_iniciar.setEnabled(False); self.progress.setValue(0); self.post_timer.start(550)
 
     def _avanzar_post(self):
         if self._post_paso < len(self._post_eventos):
-            nombre,msg,_e=self._post_eventos[self._post_paso]
-            self.log.append(f"[{self._post_paso+1}/{len(self._post_eventos)}] {nombre}: {msg}")
+            nombre,msg,estado=self._post_eventos[self._post_paso]
+            self.log.append(f"[{self._post_paso+1}/{len(self._post_eventos)}] {nombre}: {msg} -> {estado.value}")
             self.progress.setValue(int((self._post_paso+1)*100/len(self._post_eventos))); self._post_paso+=1; self.dashboard.refresh()
         else:
             self.post_timer.stop(); self._evaluar(); self.btn_iniciar.setEnabled(True)
 
     def _evaluar(self):
-        hay_f=any(c.estado==Estado.FALLA for c in self.engine.componentes); hay_p=any(c.estado==Estado.PRECAUCION for c in self.engine.componentes)
-        if hay_f: self.log.append("🔴 SISTEMA NO PUEDE ARRANCAR - Se detectaron fallas críticas.")
-        elif hay_p: self.log.append("🟡 SISTEMA CON PRECAUCIÓN - Se detectaron advertencias.")
-        else: self.log.append("🟢 SISTEMA OK - POST completado correctamente.")
-
-    def aplicar_falla(self):
-        cid=self.combo_falla.currentData()
-        if cid: self.post.simular_falla(cid); self.combo_prec.setCurrentIndex(0); self.dashboard.refresh()
-
-    def aplicar_prec(self):
-        cid=self.combo_prec.currentData()
-        if cid: self.post.simular_precaucion(cid); self.combo_falla.setCurrentIndex(0); self.dashboard.refresh()
+        if self.post.resultado==Resultado.FALLO_CRITICO:
+            self.log.append("🔴 ERROR CRÍTICO - EL ARRANQUE SE HA DETENIDO.")
+            self.log.append("   No se puede iniciar el sistema operativo por un fallo físico crítico.")
+        elif self.post.resultado==Resultado.ADVERTENCIA:
+            self.log.append("🟡 POST COMPLETADO CON ADVERTENCIAS - INICIANDO SISTEMA OPERATIVO...")
+            self.log.append("   El sistema arrancará, pero se sugiere revisión del equipo.")
+        else:
+            self.log.append("🟢 SISTEMA CORRECTO (OK) - INICIANDO SISTEMA OPERATIVO...")

@@ -14,8 +14,8 @@ class ComponentItem(QFrame):
         self.setFrameStyle(QFrame.StyledPanel | QFrame.Raised)
         self.setObjectName("comp_item")
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(10, 6, 10, 6)
-        layout.setSpacing(10)
+        layout.setContentsMargins(18, 14, 18, 14)
+        layout.setSpacing(18)
 
         # Icono
         icon_label = QLabel()
@@ -35,12 +35,12 @@ class ComponentItem(QFrame):
             icon_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "resources", "icons", f"{mapping.get(componente.id, componente.id)}.svg")
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
-            icon_label.setPixmap(icon.pixmap(24, 24))
+            icon_label.setPixmap(icon.pixmap(40, 40))
         layout.addWidget(icon_label)
 
         # Nombre
         name_label = QLabel(componente.nombre)
-        name_font = QFont("Consolas", 10)
+        name_font = QFont("Consolas", 15, QFont.Bold)
         name_label.setFont(name_font)
         layout.addWidget(name_label)
         layout.addStretch()
@@ -49,7 +49,7 @@ class ComponentItem(QFrame):
         self.estado_label = QLabel(componente.estado.value)
         self.estado_label.setObjectName(f"estado_{componente.id}")
         self.estado_label.setAlignment(Qt.AlignCenter)
-        est_font = QFont("Consolas", 9, QFont.Bold)
+        est_font = QFont("Consolas", 13, QFont.Bold)
         self.estado_label.setFont(est_font)
         layout.addWidget(self.estado_label)
 
@@ -59,7 +59,7 @@ class ComponentItem(QFrame):
         # Estilos por estado
         if est == Estado.FUNCIONAL:
             self.estado_label.setStyleSheet("color: #22c55e;")
-        elif est == Estado.PRECAUCION:
+        elif est == Estado.PRECAUCIÓN:
             self.estado_label.setStyleSheet("color: #f59e0b;")
         elif est == Estado.FALLA:
             self.estado_label.setStyleSheet("color: #ef4444;")
@@ -70,11 +70,11 @@ class DashboardWidget(QWidget):
         self.engine = engine
         self.items = {}
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(10, 10, 10, 10)
-        layout.setSpacing(6)
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(12)
 
         header = QLabel("COMPONENTES")
-        header_font = QFont("Consolas", 12, QFont.Bold)
+        header_font = QFont("Consolas", 16, QFont.Bold)
         header.setFont(header_font)
         header.setAlignment(Qt.AlignCenter)
         layout.addWidget(header)

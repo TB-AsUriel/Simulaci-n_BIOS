@@ -7,6 +7,12 @@ class Estado(Enum):
     PRECAUCIÓN = "PRECAUCIÓN"
     FALLA = "FALLA"
 
+
+class Resultado(Enum):
+    OK = "OK"
+    ADVERTENCIA = "ADVERTENCIA"
+    FALLO_CRITICO = "FALLO_CRITICO"
+
 @dataclass
 class Componente:
     id: str
